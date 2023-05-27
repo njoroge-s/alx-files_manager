@@ -22,7 +22,8 @@ class RedisClient {
           resolve(value);
         }
       });
-    },
+    });
+  }
 
   async set(key, value, duration) {
     return new Promise((resolve, reject) => {
