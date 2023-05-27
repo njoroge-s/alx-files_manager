@@ -1,6 +1,10 @@
 import { createClient } from 'redis';
 
 class RedisClient {
+    /**
+     * a constructor that creates a client to Redis
+     * any error of the redis client must be displayed in the console
+     */
   constructor() {
     this.client = createClient();
 
@@ -8,11 +12,17 @@ class RedisClient {
       console.error('Redis client error:', error);
     });
   }
-
+  /**
+   * a function isAlive 
+   * returns true when the connection to Redis is a success otherwise, false
+   */
   isAlive() {
     return this.client.connected;
   }
-
+  /**
+   * an asynchronous function get that takes a string key as argument
+   * returns the Redis value stored for this key
+   */
   async get(key) {
     return new Promise((resolve, reject) => {
       this.client.get(key, (error, value) => {
@@ -24,7 +34,13 @@ class RedisClient {
       });
     });
   }
-
+  /**
+   * asynchronous function set
+   * @param {string} key 
+   * @param {*} value 
+   * @param {second} duration 
+   * store it in Redis (with an expiration set by the duration argument)
+   */
   async set(key, value, duration) {
     return new Promise((resolve, reject) => {
       this.client.setex(key, duration, value, (error, result) => {
@@ -36,6 +52,11 @@ class RedisClient {
       });
     });
   }
+  /**
+   * asynchronous function del
+   * @param {*} key 
+   *  remove the value in Redis for this key
+   */
 
   async del(key) {
     return new Promise((resolve, reject) => {
