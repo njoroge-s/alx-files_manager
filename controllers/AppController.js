@@ -1,5 +1,5 @@
-const redisClient = require('../redis');
-const dbClient = require('../db');
+import { isAlive } from '../redis';
+import { isAlive as _isAlive, nbUsers, nbFiles } from '../db';
 
 async function getStatus(req, res) {
   const redisAlive = isAlive();
