@@ -66,7 +66,7 @@ const UsersController = {
       }
 
       //returns the user object with Id and email only
-      const usersCollection = db.collection('users');
+      const usersCollection = db.collection('users') ;
 
       const user = await usersCollection.findOne(
         { _id: db.ObjectID(userId) },

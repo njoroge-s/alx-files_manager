@@ -8,6 +8,7 @@ const port = process.env.PORT || 5000;
 // Load routes
 app.use('/', routes);
 
+//start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

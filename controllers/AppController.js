@@ -1,35 +1,35 @@
-import { isAlive } from '../utils/redis';
-import { isAlive as _isAlive, nbUsers, nbFiles } from '../utils/db';
+const redisClient = require('../redis');
+const dbClient = require('../db');
 
-const AppController = {
-  getStatus: async (req, res) => {
-    const redisStatus = isAlive();
-    const dbStatus = await _isAlive();
+async function getStatus(req, res) {
+  const redisAlive = isAlive();
+  const dbAlive = await _isAlive();
 
-    const status = {
-      redis: redisStatus,
-      db: dbStatus,
+  const status = {
+    redis: redisAlive,
+    db: dbAlive,
+  };
+
+  return res.status(200).json(status);
+}
+
+async function getStats(req, res) {
+  try {
+    const usersCount = await nbUsers();
+    const filesCount = await nbFiles();
+
+    const stats = {
+      users: usersCount,
+      files: filesCount,
     };
 
-    res.status(200).json(status);
-  },
+    return res.status(200).json(stats);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 
-  getStats: async (req, res) => {
-    try {
-      const usersCount = await nbUsers();
-      const filesCount = await nbFiles();
-
-      const stats = {
-        users: usersCount,
-        files: filesCount,
-      };
-
-      res.status(200).json(stats);
-    } catch (error) {
-      console.error('Error retrieving stats:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  },
+export default {
+  getStatus,
+  getStats,
 };
-
-export default AppController;
