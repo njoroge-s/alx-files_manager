@@ -1,35 +1,18 @@
-import { isAlive } from '../redis';
-import { isAlive as _isAlive, nbUsers, nbFiles } from '../db';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
-async function getStatus(req, res) {
-  const redisAlive = isAlive();
-  const dbAlive = await _isAlive();
+export default class AppController {
+  static getStatus(req, res) {
+    res.status(200).json({
+      redis: redisClient.isAlive(),
+      db: dbClient.isAlive(),
+    });
+  }
 
-  const status = {
-    redis: redisAlive,
-    db: dbAlive,
-  };
-
-  return res.status(200).json(status);
-}
-
-async function getStats(req, res) {
-  try {
-    const usersCount = await nbUsers();
-    const filesCount = await nbFiles();
-
-    const stats = {
-      users: usersCount,
-      files: filesCount,
-    };
-
-    return res.status(200).json(stats);
-  } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+  static getStats(req, res) {
+    Promise.all([dbClient.nbUsers(), dbClient.nbFiles()])
+      .then(([usersCount, filesCount]) => {
+        res.status(200).json({ users: usersCount, files: filesCount });
+      });
   }
 }
-
-export default {
-  getStatus,
-  getStats,
-};
