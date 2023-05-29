@@ -1,7 +1,8 @@
+import { ObjectId } from 'mongodb';
 import sha1 from 'sha1';
-import { client } from '../utils/db';
+import dbClient from '../utils/db';
 
-  async function postNew(req, res) {
+export const postNew = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email) {
@@ -12,7 +13,7 @@ import { client } from '../utils/db';
     return res.status(400).json({ error: 'Missing password' });
   }
 
-  const userExists = await client
+  const userExists = await dbClient.client
     .db()
     .collection('users')
     .findOne({ email });
@@ -28,7 +29,7 @@ import { client } from '../utils/db';
     password: hashedPassword,
   };
 
-  const result = await client
+  const result = await dbClient.client
     .db()
     .collection('users')
     .insertOne(newUser);
@@ -36,12 +37,12 @@ import { client } from '../utils/db';
   const { _id: id } = result.ops[0];
 
   return res.status(201).json({ email, id });
-}
+};
 
-async function getMe(req, res) {
+export const getMe = async (req, res) => {
   const { userId } = req;
 
-  const user = await client
+  const user = await dbClient.client
     .db()
     .collection('users')
     .findOne({ _id: ObjectId(userId) });
@@ -53,9 +54,4 @@ async function getMe(req, res) {
   const { email, _id: id } = user;
 
   return res.status(200).json({ email, id });
-}
-
-export default {
-  postNew,
-  getMe,
 };
