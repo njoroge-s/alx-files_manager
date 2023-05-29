@@ -152,6 +152,7 @@ export const putUnpublishFile = async (req, res) => {
 export const getFileData = async (req, res) => {
   const { userId } = req;
   const { id } = req.params;
+  const { size } = req.query;
 
   const file = await dbClient.client
     .db()
@@ -170,13 +171,15 @@ export const getFileData = async (req, res) => {
     return res.status(400).json({ error: "A folder doesn't have content" });
   }
 
-  if (!fs.existsSync(file.localPath)) {
+  const thumbnailPath = `${file.localPath}_${size}`;
+
+  if (!fs.existsSync(thumbnailPath)) {
     return res.status(404).json({ error: 'Not found' });
   }
 
   const mimeType = mime.lookup(file.name);
 
   res.setHeader('Content-Type', mimeType);
-  const fileStream = fs.createReadStream(file.localPath);
+  const fileStream = fs.createReadStream(thumbnailPath);
   fileStream.pipe(res);
 };
